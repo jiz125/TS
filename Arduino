@@ -1,0 +1,204 @@
+
+int potentiometerValue = 0;
+const int buttonPin = 7;     // the number of the pushbutton pin
+const int buttonPin2 = 6;     // the number of the pushbutton pin
+const int buttonPin3 = 5;     // the number of the pushbutton pin
+const int buttonPin4 = 4;     // the number of the pushbutton pin
+
+int buttonState = 0;         // variable for reading the pushbutton status
+int buttonState2 = 2;         // variable for reading the pushbutton status
+int buttonState3 = 4;         // variable for reading the pushbutton status
+int buttonState4 = 6;         // variable for reading the pushbutton status
+
+
+const int RELAY_PIN = A5;  // the Arduino pin, which connects to the IN pin of relay
+const int RELAY_PIN2 = A4;  // the Arduino pin, which connects to the IN pin of relay
+const int RELAY_PIN3 = A3;  // the Arduino pin, which connects to the IN pin of relay
+
+
+char val; // Data received from the serial port
+
+int fanState = LOW;             // ledState used to set the LED
+int fanState2 = LOW;             // ledState used to set the LED
+int fanState3 = LOW;             // ledState used to set the LED
+
+unsigned long previousMillis = 0;        // will store last time LED was updated
+
+// constants won't change:
+const long interval = 10000;           // interval at which to blink (milliseconds)
+const long intervalStop = 5000;           // interval at which to blink (milliseconds)
+//unsigned long currentMillis = millis();
+
+
+void setup() {
+  
+  // set the digital pin as output:
+  pinMode(RELAY_PIN, OUTPUT);
+  pinMode(RELAY_PIN2, OUTPUT);
+  pinMode(RELAY_PIN3, OUTPUT);
+  
+  pinMode(buttonPin, INPUT);
+  pinMode(buttonPin2, INPUT);
+  pinMode(buttonPin3, INPUT);
+  pinMode(buttonPin4, INPUT);
+
+
+
+
+  Serial.begin(9600);
+
+}
+
+void loop() {
+
+//curtain state #1 
+  buttonState = digitalRead(buttonPin);
+  if (buttonState == HIGH) {   
+//  Serial.write(buttonState);
+   Serial.println("1"); //high for 1 
+  } else {   
+   Serial.println("0"); //low for 0
+//  Serial.write(buttonState);
+  }
+////  
+////curtain state #2 
+   buttonState2 = digitalRead(buttonPin2);
+  if (buttonState2 == HIGH) {   
+//  Serial.write(buttonState);
+   Serial.println("3"); //high for 4 
+  } else {   
+   Serial.println("2"); //low for 3
+//  Serial.write(buttonState);
+  }
+
+////curtain state #3 
+  buttonState3 = digitalRead(buttonPin3);
+  if (buttonState3 == HIGH) {   
+   Serial.println("5"); //high for 1 
+  } else {   
+   Serial.println("4"); //low for 0
+  }
+
+  ////curtain state #4 
+  buttonState4 = digitalRead(buttonPin4);
+  if (buttonState4 == HIGH) {   
+   Serial.println("7"); //high for 1 
+  } else {   
+   Serial.println("6"); //low for 0
+  }
+
+  delay(200);
+  
+ 
+
+
+
+////////fannnnnnnnnn/////////////////
+
+//  unsigned long currentMillis = millis();
+
+
+    if (Serial.available() > 0) { // If data is available to read,
+      val = Serial.read(); // read it and store it in val
+
+      /////Fan 1
+      if (val == '1') { // If 1 was received
+        fanState2 = LOW;
+        fanState3 = LOW;
+
+        /////start the fan after 5s
+        if (fanState == LOW){
+          if(millis() - previousMillis >= intervalStop){
+            fanState = HIGH;
+            previousMillis = millis();
+            }
+            } 
+            /////stop the fan after 10s
+         if (fanState == HIGH){
+           if(millis() - previousMillis >= interval){
+            fanState = LOW;
+            previousMillis = millis();
+            }
+            } 
+
+     
+      
+      /////Fan 2
+      } if (val == '2') {
+        fanState = LOW;
+        fanState3 = LOW;
+
+        if (fanState2 == LOW){
+        if(millis() - previousMillis >= intervalStop){
+            fanState2 = HIGH;
+            previousMillis = millis();
+            }
+            } 
+            /////stop the fan after 10s
+         if (fanState2 == HIGH){
+           if(millis() - previousMillis >= interval){
+            fanState2 = LOW;
+            previousMillis = millis();
+            }
+            }
+
+
+      /////Fan 3
+      } if (val == '3') {
+        fanState = LOW;
+        fanState2 = LOW;
+
+        if (fanState3 == LOW){
+        if(millis() - previousMillis >= intervalStop){
+            fanState3 = HIGH;
+            previousMillis = millis();
+            }
+            } 
+            /////stop the fan after 10s
+         if (fanState3 == HIGH){
+           if(millis() - previousMillis >= interval){
+            fanState3 = LOW;
+            previousMillis = millis();
+            }
+            } 
+        
+      } else if (val == '0') {
+        fanState = LOW;
+        fanState2 = LOW;
+        fanState3 = LOW;
+        }
+        }
+
+
+    ////////// set the fAN with the ledState of the variable:
+    digitalWrite(RELAY_PIN, fanState); //A5
+    digitalWrite(RELAY_PIN2, fanState2); //A4
+    digitalWrite(RELAY_PIN3, fanState3); //A3
+
+}
+
+
+
+
+
+
+
+
+
+
+
+// if (val == '1') { // If 1 was received
+//     digitalWrite(RELAY_PIN, HIGH); // turn the LED on
+//          Serial.println("1");
+////      fanState = HIGH;
+//   } if (val == '2') {
+////          fanState = LOW;
+//     digitalWrite(RELAY_PIN, LOW); // otherwise turn it off
+//          Serial.println("2");
+//
+//   }
+//    if (fanState == LOW) {
+//      fanState = HIGH;
+//    } else {
+//      fanState = LOW;
+//    }
