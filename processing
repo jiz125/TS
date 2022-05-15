@@ -1,0 +1,316 @@
+import processing.serial.*;
+import processing.video.*;
+
+
+
+Serial myPort;  // Create object from Serial class
+int curtainState;
+
+
+//load videos
+Movie video1;
+Movie video2;
+Movie video3;
+Movie video4;
+
+
+//load window frames
+//PImage windowImg;
+
+
+boolean curtain1 = false;
+boolean curtain2 = false;
+boolean curtain3 = false; //closed
+boolean curtain4 = false; //closed
+
+float transparency1 = 255;
+float transparency2 = 255;
+float transparency3 = 255;
+float transparency4 = 255;
+
+
+
+
+int c1 = 0;
+int c2 = 800;
+int c3 = 0;
+int ch3 = 500;
+int c4 = 800;
+int ch4 = 500;
+
+
+
+void setup() {
+  size(1440, 1000);
+  myPort = new Serial(this, Serial.list()[2], 9600);
+  
+   //load videos
+  video1 = new Movie(this, "1.mov"); //curtain 1
+  video1.loop();
+
+  video2 = new Movie(this, "2.mov"); //curtain 2
+  video2.loop();
+  
+  video3 = new Movie(this, "34c.mov"); //curtain 3
+  video3.loop();
+  
+  video4 = new Movie(this, "34c.mov"); //curtain 4
+  video4.loop();
+
+  
+}
+
+void movieEvent(Movie video) {
+  video.read();
+}
+
+//getting data from port
+void serialEvent (Serial myPort) {
+  String inString = myPort.readStringUntil('\n'); //read until new line (Serial.println on Arduino)
+  if (inString != null) {
+    inString = trim(inString); // trim off whitespace
+    //println(inString);   
+    
+    if(inString.equals("0")){
+    println("1 closed");
+    curtain1 = false; //closed
+    
+
+    } else if (inString.equals("1")) {
+    println("1 is triggered");
+    curtain1 = true;
+    } 
+    
+    if (inString.equals("2")){
+    println("2 closed");
+    curtain2 = false;
+    
+    } else if (inString.equals("3")){
+    println("2 is triggered");
+    curtain2 = true;
+    }
+    
+    if (inString.equals("4")){
+    println("3 closed");
+    curtain3 = false;
+    
+    } else if (inString.equals("5")){
+    println("3 is triggered");
+    curtain3 = true;
+    }
+    
+    if (inString.equals("6")){
+    println("4 closed");
+    curtain4 = false;
+
+    } else if (inString.equals("7")){
+    println("4 is triggered");
+    curtain4 = true;
+    }
+  }
+}
+
+//void mouseClicked() {
+//  if (mouseX < 400) {
+
+//    if(curtain1 == true){
+//    curtain1 = false;
+//        //println(curtain1);
+//  } else {
+//    curtain1 = true;
+//            //println(curtain1)
+    
+//  }
+//}
+
+//if (mouseX > width/2 - 100 && mouseX < width/2+ 100 ) {
+//  if(curtain2 == true){
+//     curtain2 = false;
+//  } else {
+//    curtain2 = true;
+//  }
+//}
+
+//if (mouseX > width - 200 ) {
+//  if(curtain3 == true){
+//     curtain3 = false;
+//  } else {
+//    curtain3 = true;
+//  }
+//}
+
+//}
+
+void draw() {
+  background(0);
+  
+      
+ /////////strat drawing curtain///////////////////////////////////////////////////////////////
+  
+  if(curtain1 == false && curtain2 == false && curtain3 == false && curtain4 == false){ //all closed  //show 1 
+    image(video1, c1, 0, 400, 700); //show curtain 1 
+    textSize(90);
+    text("all closed", width/2-200, height/2);
+  
+    //rect(0,0,width,height);
+    
+    //set all transparency back to black
+    transparency1 = 0;
+    transparency2 = 255;
+    transparency3 = 255;
+    transparency4 = 255;
+
+
+//////////////1 curtain close////////////////////////////
+    
+  } else if (curtain1 == true && curtain2 == true && curtain3 == true && curtain4 == false){  //1 & 2 & 3 open //show 4 
+  
+    transparency4 -= 5; ///slowly reveal 4
+    image(video4, c4, ch4, 600, 300); //show curtain 4   
+  
+  } else if (curtain1 == true && curtain2 == true && curtain3 == false && curtain4 == true ){ //1 & 2 & 4 open //show 3   
+    
+    transparency3 -= 5; ///slowly reveal 3
+    image(video3, c3, ch3, 600, 300); //show curtain 3 
+  
+  } else if (curtain1 == true && curtain2 == false && curtain3 == true && curtain4 == true ){ //1 & 3 & 4 open //show 2 
+    
+    transparency2 -= 5; ///slowly reveal 2
+    image(video2, c2, 0, 600, 300); //show curtain 2
+    
+  } else if (curtain1 == false && curtain2 == true && curtain3 == true && curtain4 == true ){ //2 & 3 & 4 open //show 1
+
+    transparency1 -= 5; ///slowly reveal 1
+    image(video1, c1, 0, 600, 300); //show curtain 1 
+    
+ 
+//////////////2 curtains close
+  } else if (curtain1 == true && curtain2 == true && curtain3 == false && curtain4 == false) { // 1 & 2 open, 3 & 4 closed // show 3   
+
+    transparency3 -= 5; ///slowly reveal 3
+    transparency4 -= 10;
+    transparency2 = 255;
+    transparency1 = 255; 
+
+    image(video3, c3, ch3, 600, 300); //show curtain 3 
+    image(video4, c4, ch4, 600, 300); //show curtain 4
+
+  
+  } else if (curtain1 == true && curtain2 == false && curtain3 == true && curtain4 == false ) { // 1 & 3 open, 2 & 4 closed // show 4
+
+    transparency4 -= 5; ///slowly reveal 4
+    transparency2 -= 10;
+    transparency3 = 255; 
+    transparency1 = 255; 
+
+    image(video4,  c4, ch4, 600, 300); //show curtain 4 
+    image(video2, c2, 0, 600, 300); //show curtain 2
+  
+  
+   } else if (curtain1 == true && curtain2 == false && curtain3 == false && curtain4 == true) { // 1 & 4 open, 2 & 3 closed // show 2
+    
+    transparency2 -= 5; ///slowly reveal 2
+    transparency3 -= 10;
+    transparency4 = 255; 
+    transparency1 = 255; 
+
+    image(video2, c2, 0, 600, 300); //show curtain 2
+    image(video3, c3, ch3, 600, 300); //show curtain 3
+     
+    
+  } else if (curtain1 == false && curtain2 == true && curtain3 == true && curtain4 == false) { // 2 & 3 open, 1 & 4 closed // show 1
+    
+    transparency1 -= 5; ///slowly reveal 1
+    transparency2 = 255;
+    transparency3 = 255; 
+    transparency4 -= 10; 
+
+    image(video1, c1, 0, 600, 300); //show curtain 1
+    image(video4, c4, ch4, 600, 300); //show curtain 4
+
+    
+  } else if (curtain1 == false && curtain2 == true && curtain3 == false && curtain4 == true) { // 2 & 4 open, 1 & 3 closed // show 3
+
+    transparency3 -= 5; ///slowly reveal 3
+    transparency1 -= 10;
+    transparency2 = 255; 
+    transparency4 = 255; 
+ 
+    image(video3, c3, ch3, 600, 300); //show curtain 3
+    image(video1, c1, 0, 600, 300); //show curtain 1
+ 
+ } else if (curtain1 == false && curtain2 == false && curtain3 == true && curtain4 == true) { // 3 & 4 open, 1 & 2 closed // show 2
+    
+    transparency2 -= 5; ///slowly reveal 2
+    transparency1 -= 15;
+    transparency3 = 255; 
+    transparency4 = 255; 
+    
+    image(video2, c2, 0, 600, 300); //show curtain 2
+    image(video1, c1, 0, 600, 300); //show curtain 1
+
+        
+  //////////////3 curtains close
+  
+ } else if (curtain1 == true && curtain2 == false && curtain3 == false && curtain4 == false) { // 1 open, 2 & 3 & 4 closed // show 2    
+    
+    transparency2 -= 5; ///slowly reveal 2
+    transparency1 = 0;
+    transparency3 = 255; 
+    transparency4 = 255;
+    image(video2, c2, 0, 600, 300); //show curtain 2
+
+
+        
+ } else if (curtain1 == false && curtain2 == true && curtain3 == false && curtain4 == false) { // 2 open, 1 & 3 & 4 closed // show 3    
+      
+    transparency3 -= 5; ///slowly reveal 1
+    transparency2 = 0;
+    transparency1 = 255; 
+    transparency4 = 255;
+    image(video3, c3, ch3, 600, 300); //show curtain 3
+
+
+ } else if (curtain1 == false && curtain2 == false && curtain3 == true && curtain4 == false) { // 3 open, 1 & 2 & 4 closed // show 4
+    
+    transparency4 -= 5; ///slowly reveal 4
+    transparency1 = 255;
+    transparency3 = 0; 
+    transparency2 = 255;
+    image(video4, c4, ch4, 600, 300); //show curtain 4    
+
+ } else if (curtain1 == false && curtain2 == false && curtain3 == false && curtain4 == true) { // 4 open, 1 & 2 & 3 closed // show 3
+ 
+    transparency3 -= 5; ///slowly reveal 3
+    image(video3, c3, ch3, 600, 300); //show curtain 3  
+
+  } else if (curtain1 == true && curtain2 == true && curtain3 == true && curtain4 == true){ //all open
+    rect(c1,0,200,height); //open 1
+    rect(c2,0,200,height); //open 2
+    rect(c3,0,200,height); //open 3
+    rect(c4,0,200,height); //open 3
+    text("all open", width/2, height/2);
+  }
+  
+
+  
+  println(transparency4);
+    
+  textSize(20);
+  fill(0,transparency1);
+  rect(c1,0,600,300);
+  text("curtain1 ", c1, 315);
+  //
+  fill(0,transparency2);
+  rect(c2,0,600,300);
+  text("curtain2 ",c2, 315);
+  //
+  fill(0,transparency3);
+  rect(c3,ch3,600,300);
+  text("curtain3 ",c3, ch3);
+  //
+  fill(0,transparency4);
+  rect(c4,ch4,600,300);
+  text("curtain4 ",c4, ch4);
+  
+}
