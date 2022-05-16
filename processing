@@ -1,5 +1,9 @@
 import processing.serial.*;
 import processing.video.*;
+import codeanticode.syphon.*;
+
+PGraphics canvas;
+SyphonServer server;
 
 
 
@@ -14,9 +18,6 @@ Movie video3;
 Movie video4;
 
 
-//load window frames
-//PImage windowImg;
-
 
 boolean curtain1 = false;
 boolean curtain2 = false;
@@ -30,31 +31,55 @@ float transparency4 = 255;
 
 
 
-
 int c1 = 0;
-int c2 = 800;
-int c3 = 0;
-int ch3 = 500;
-int c4 = 800;
-int ch4 = 500;
+int c2 = 360;
+int c3 = 720;
+int ch3 = 0;
+int c4 = 1080;
+int ch4 = 0;
+
+int w1 = 360;
+int h1 = 500;
+//int h1 = 478; //video 1
+
+int w2 = 360;
+//int h2 = 606;
+int h2 = 514;
+
+
+int w3 = 360;
+//int h3 = 490;
+int h3 = 478; 
+
+
+int w4 = 360;
+//int h4 = 514;
+int h4 = 606;
 
 
 
 void setup() {
-  size(1440, 1000);
-  myPort = new Serial(this, Serial.list()[2], 9600);
   
+  //madmapper setup
+  size(1440, 1000, P3D);
+  canvas = createGraphics(1440, 1000, P3D);
+  server = new SyphonServer(this, "Processing Syphon");
+
+//arduino
+  myPort = new Serial(this, Serial.list()[2], 9600);
+
+//import videos
    //load videos
-  video1 = new Movie(this, "1.mov"); //curtain 1
+  video1 = new Movie(this, "3.mov"); //curtain 1
   video1.loop();
 
-  video2 = new Movie(this, "2.mov"); //curtain 2
+  video2 = new Movie(this, "4.mov"); //curtain 2
   video2.loop();
   
-  video3 = new Movie(this, "34c.mov"); //curtain 3
+  video3 = new Movie(this, "1.mov"); //curtain 3
   video3.loop();
   
-  video4 = new Movie(this, "34c.mov"); //curtain 4
+  video4 = new Movie(this, "2.mov"); //curtain 4
   video4.loop();
 
   
@@ -110,47 +135,22 @@ void serialEvent (Serial myPort) {
   }
 }
 
-//void mouseClicked() {
-//  if (mouseX < 400) {
 
-//    if(curtain1 == true){
-//    curtain1 = false;
-//        //println(curtain1);
-//  } else {
-//    curtain1 = true;
-//            //println(curtain1)
-    
-//  }
-//}
 
-//if (mouseX > width/2 - 100 && mouseX < width/2+ 100 ) {
-//  if(curtain2 == true){
-//     curtain2 = false;
-//  } else {
-//    curtain2 = true;
-//  }
-//}
-
-//if (mouseX > width - 200 ) {
-//  if(curtain3 == true){
-//     curtain3 = false;
-//  } else {
-//    curtain3 = true;
-//  }
-//}
-
-//}
 
 void draw() {
-  background(0);
   
+  ///start drawing
+  canvas.beginDraw();
+  canvas.background(0);
+  //canvas.noStroke();
       
  /////////strat drawing curtain///////////////////////////////////////////////////////////////
   
   if(curtain1 == false && curtain2 == false && curtain3 == false && curtain4 == false){ //all closed  //show 1 
-    image(video1, c1, 0, 400, 700); //show curtain 1 
-    textSize(90);
-    text("all closed", width/2-200, height/2);
+    canvas.image(video1, c1, 0,w1,h1); //show curtain 1 
+    println("it is closed");
+    //rect()
   
     //rect(0,0,width,height);
     
@@ -166,22 +166,22 @@ void draw() {
   } else if (curtain1 == true && curtain2 == true && curtain3 == true && curtain4 == false){  //1 & 2 & 3 open //show 4 
   
     transparency4 -= 5; ///slowly reveal 4
-    image(video4, c4, ch4, 600, 300); //show curtain 4   
+    canvas.image(video4, c4, ch4, w4, h4); //show curtain 4   
   
   } else if (curtain1 == true && curtain2 == true && curtain3 == false && curtain4 == true ){ //1 & 2 & 4 open //show 3   
     
     transparency3 -= 5; ///slowly reveal 3
-    image(video3, c3, ch3, 600, 300); //show curtain 3 
+    canvas.image(video3, c3, ch3, w3, h3); //show curtain 3 
   
   } else if (curtain1 == true && curtain2 == false && curtain3 == true && curtain4 == true ){ //1 & 3 & 4 open //show 2 
     
     transparency2 -= 5; ///slowly reveal 2
-    image(video2, c2, 0, 600, 300); //show curtain 2
+    canvas.image(video2, c2, 0, w2, h2); //show curtain 2
     
   } else if (curtain1 == false && curtain2 == true && curtain3 == true && curtain4 == true ){ //2 & 3 & 4 open //show 1
 
     transparency1 -= 5; ///slowly reveal 1
-    image(video1, c1, 0, 600, 300); //show curtain 1 
+    canvas.image(video1, c1, 0, w1, h1); //show curtain 1 
     
  
 //////////////2 curtains close
@@ -192,8 +192,8 @@ void draw() {
     transparency2 = 255;
     transparency1 = 255; 
 
-    image(video3, c3, ch3, 600, 300); //show curtain 3 
-    image(video4, c4, ch4, 600, 300); //show curtain 4
+    canvas.image(video3, c3, ch3, w3, h3); //show curtain 3 
+    canvas.image(video4, c4, ch4, w4, h4); //show curtain 4
 
   
   } else if (curtain1 == true && curtain2 == false && curtain3 == true && curtain4 == false ) { // 1 & 3 open, 2 & 4 closed // show 4
@@ -203,8 +203,8 @@ void draw() {
     transparency3 = 255; 
     transparency1 = 255; 
 
-    image(video4,  c4, ch4, 600, 300); //show curtain 4 
-    image(video2, c2, 0, 600, 300); //show curtain 2
+    canvas.image(video4,  c4, ch4, w4, h4); //show curtain 4 
+    canvas.image(video2, c2, 0, w2, h2); //show curtain 2
   
   
    } else if (curtain1 == true && curtain2 == false && curtain3 == false && curtain4 == true) { // 1 & 4 open, 2 & 3 closed // show 2
@@ -214,8 +214,8 @@ void draw() {
     transparency4 = 255; 
     transparency1 = 255; 
 
-    image(video2, c2, 0, 600, 300); //show curtain 2
-    image(video3, c3, ch3, 600, 300); //show curtain 3
+    canvas.image(video2, c2, 0, w2, h2); //show curtain 2
+    canvas.image(video3, c3, ch3, w3, h3); //show curtain 3
      
     
   } else if (curtain1 == false && curtain2 == true && curtain3 == true && curtain4 == false) { // 2 & 3 open, 1 & 4 closed // show 1
@@ -225,92 +225,101 @@ void draw() {
     transparency3 = 255; 
     transparency4 -= 10; 
 
-    image(video1, c1, 0, 600, 300); //show curtain 1
-    image(video4, c4, ch4, 600, 300); //show curtain 4
+    canvas.image(video1, c1, 0, w1, h1); //show curtain 1
+    canvas.image(video4, c4, ch4, w4, h4); //show curtain 4
 
     
-  } else if (curtain1 == false && curtain2 == true && curtain3 == false && curtain4 == true) { // 2 & 4 open, 1 & 3 closed // show 3
+  } else if (curtain1 == false && curtain2 == true && curtain3 == false && curtain4 == true) { // 2 & 4 open, 1 & 3 closed // projecting 3
 
     transparency3 -= 5; ///slowly reveal 3
     transparency1 -= 10;
     transparency2 = 255; 
     transparency4 = 255; 
  
-    image(video3, c3, ch3, 600, 300); //show curtain 3
-    image(video1, c1, 0, 600, 300); //show curtain 1
+    canvas.image(video3, c3, ch3, w3, h3); //projecting curtain 3
+    canvas.image(video1, c1, 0, w1, h1); //projecting curtain 1
  
- } else if (curtain1 == false && curtain2 == false && curtain3 == true && curtain4 == true) { // 3 & 4 open, 1 & 2 closed // show 2
+ } else if (curtain1 == false && curtain2 == false && curtain3 == true && curtain4 == true) { // 3 & 4 open, 1 & 2 closed // projecting 2
     
     transparency2 -= 5; ///slowly reveal 2
     transparency1 -= 15;
     transparency3 = 255; 
     transparency4 = 255; 
     
-    image(video2, c2, 0, 600, 300); //show curtain 2
-    image(video1, c1, 0, 600, 300); //show curtain 1
+    canvas.image(video2, c2, 0, w2, h2); //projecting curtain 2
+    canvas.image(video1, c1, 0, w1, h1); //projecting curtain 1
 
         
   //////////////3 curtains close
   
- } else if (curtain1 == true && curtain2 == false && curtain3 == false && curtain4 == false) { // 1 open, 2 & 3 & 4 closed // show 2    
+ } else if (curtain1 == true && curtain2 == false && curtain3 == false && curtain4 == false) { // 1 open, 2 & 3 & 4 closed // projecting 2    
     
     transparency2 -= 5; ///slowly reveal 2
     transparency1 = 0;
     transparency3 = 255; 
     transparency4 = 255;
-    image(video2, c2, 0, 600, 300); //show curtain 2
-
+    canvas.image(video2, c2, 0, w2, h2); //projecting curtain 2
+    println("curtain 2 projecting");
 
         
- } else if (curtain1 == false && curtain2 == true && curtain3 == false && curtain4 == false) { // 2 open, 1 & 3 & 4 closed // show 3    
+ } else if (curtain1 == false && curtain2 == true && curtain3 == false && curtain4 == false) { // 2 open, 1 & 3 & 4 closed // projecting 3    
       
     transparency3 -= 5; ///slowly reveal 1
     transparency2 = 0;
     transparency1 = 255; 
     transparency4 = 255;
-    image(video3, c3, ch3, 600, 300); //show curtain 3
+    canvas.image(video3, c3, ch3, w3, h3); //projecting curtain 3
+    println("curtain 3 projecting");
 
 
- } else if (curtain1 == false && curtain2 == false && curtain3 == true && curtain4 == false) { // 3 open, 1 & 2 & 4 closed // show 4
+ } else if (curtain1 == false && curtain2 == false && curtain3 == true && curtain4 == false) { // 3 open, 1 & 2 & 4 closed //projecting 4
     
     transparency4 -= 5; ///slowly reveal 4
     transparency1 = 255;
     transparency3 = 0; 
     transparency2 = 255;
-    image(video4, c4, ch4, 600, 300); //show curtain 4    
+    canvas.image(video4, c4, ch4, w4, h4); //show curtain 4    
+    println("curtain 4 projecting");
 
  } else if (curtain1 == false && curtain2 == false && curtain3 == false && curtain4 == true) { // 4 open, 1 & 2 & 3 closed // show 3
  
     transparency3 -= 5; ///slowly reveal 3
-    image(video3, c3, ch3, 600, 300); //show curtain 3  
+    transparency1 = 255;
+    transparency2 = 255; 
+    transparency4 = 0;
+    canvas.image(video3, c3, ch3, w3, h3); //projecting curtain 3  
+    println("curtain 3 projecting");
+
 
   } else if (curtain1 == true && curtain2 == true && curtain3 == true && curtain4 == true){ //all open
-    rect(c1,0,200,height); //open 1
-    rect(c2,0,200,height); //open 2
-    rect(c3,0,200,height); //open 3
-    rect(c4,0,200,height); //open 3
-    text("all open", width/2, height/2);
+    canvas.rect(c1,0,200,height); //open 1
+    canvas.rect(c2,0,200,height); //open 2
+    canvas.rect(c3,ch3,200,height); //open 3
+    canvas.rect(c4,0,200,height); //open 3
+    //canvas.text("all open", width/2, height/2);
   }
   
 
   
-  println(transparency4);
     
-  textSize(20);
-  fill(0,transparency1);
-  rect(c1,0,600,300);
-  text("curtain1 ", c1, 315);
+  canvas.fill(0,transparency1);
+  canvas.rect(c1,0,w1,h1);
   //
-  fill(0,transparency2);
-  rect(c2,0,600,300);
-  text("curtain2 ",c2, 315);
+  canvas.fill(0,transparency2);
+  canvas.rect(c2,0,w2,h2);
   //
-  fill(0,transparency3);
-  rect(c3,ch3,600,300);
-  text("curtain3 ",c3, ch3);
+  canvas.fill(0,transparency3); //3
+  canvas.rect(c3,ch3,w3,h3);
   //
-  fill(0,transparency4);
-  rect(c4,ch4,600,300);
-  text("curtain4 ",c4, ch4);
+  canvas.fill(0,transparency4);
+  canvas.rect(c4,ch4,w4,h4);
+  
+  
+  
+  
+  ////stop drawing
+  canvas.endDraw();
+  image(canvas, 0, 0);
+  server.sendImage(canvas);
   
 }
