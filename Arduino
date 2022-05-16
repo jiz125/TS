@@ -18,7 +18,7 @@ const int RELAY_PIN3 = A3;  // the Arduino pin, which connects to the IN pin of 
 
 char val; // Data received from the serial port
 
-int fanState = LOW;             // ledState used to set the LED
+int fanState1 = LOW;             // ledState used to set the LED
 int fanState2 = LOW;             // ledState used to set the LED
 int fanState3 = LOW;             // ledState used to set the LED
 
@@ -27,7 +27,7 @@ unsigned long previousMillis = 0;        // will store last time LED was updated
 // constants won't change:
 const long interval = 10000;           // interval at which to blink (milliseconds)
 const long intervalStop = 5000;           // interval at which to blink (milliseconds)
-//unsigned long currentMillis = millis();
+unsigned long currentMillis = millis();
 
 
 void setup() {
@@ -93,112 +93,33 @@ void loop() {
 
 
 
-////////fannnnnnnnnn/////////////////
+//////////fannnnnnnnnn/////////////////
 
-//  unsigned long currentMillis = millis();
-
-
-    if (Serial.available() > 0) { // If data is available to read,
-      val = Serial.read(); // read it and store it in val
-
-      /////Fan 1
-      if (val == '1') { // If 1 was received
-        fanState2 = LOW;
-        fanState3 = LOW;
 
         /////start the fan after 5s
-        if (fanState == LOW){
+        if (fanState1 == LOW){
           if(millis() - previousMillis >= intervalStop){
-            fanState = HIGH;
-            previousMillis = millis();
-            }
-            } 
-            /////stop the fan after 10s
-         if (fanState == HIGH){
-           if(millis() - previousMillis >= interval){
-            fanState = LOW;
-            previousMillis = millis();
-            }
-            } 
-
-     
-      
-      /////Fan 2
-      } if (val == '2') {
-        fanState = LOW;
-        fanState3 = LOW;
-
-        if (fanState2 == LOW){
-        if(millis() - previousMillis >= intervalStop){
-            fanState2 = HIGH;
-            previousMillis = millis();
-            }
-            } 
-            /////stop the fan after 10s
-         if (fanState2 == HIGH){
-           if(millis() - previousMillis >= interval){
-            fanState2 = LOW;
-            previousMillis = millis();
-            }
-            }
-
-
-      /////Fan 3
-      } if (val == '3') {
-        fanState = LOW;
-        fanState2 = LOW;
-
-        if (fanState3 == LOW){
-        if(millis() - previousMillis >= intervalStop){
+            fanState1 = HIGH;
             fanState3 = HIGH;
+            fanState2 = HIGH;
+            
             previousMillis = millis();
             }
             } 
             /////stop the fan after 10s
-         if (fanState3 == HIGH){
+         if (fanState1 == HIGH){
            if(millis() - previousMillis >= interval){
+            fanState1 = LOW;
+            fanState2 = LOW;
             fanState3 = LOW;
+
+
             previousMillis = millis();
             }
-            } 
-        
-      } else if (val == '0') {
-        fanState = LOW;
-        fanState2 = LOW;
-        fanState3 = LOW;
-        }
-        }
+            }
 
+          digitalWrite(RELAY_PIN, fanState1); //A5
+          digitalWrite(RELAY_PIN2, fanState2); //A4
+          digitalWrite(RELAY_PIN3, fanState3); //A3
 
-    ////////// set the fAN with the ledState of the variable:
-    digitalWrite(RELAY_PIN, fanState); //A5
-    digitalWrite(RELAY_PIN2, fanState2); //A4
-    digitalWrite(RELAY_PIN3, fanState3); //A3
-
-}
-
-
-
-
-
-
-
-
-
-
-
-// if (val == '1') { // If 1 was received
-//     digitalWrite(RELAY_PIN, HIGH); // turn the LED on
-//          Serial.println("1");
-////      fanState = HIGH;
-//   } if (val == '2') {
-////          fanState = LOW;
-//     digitalWrite(RELAY_PIN, LOW); // otherwise turn it off
-//          Serial.println("2");
-//
-//   }
-//    if (fanState == LOW) {
-//      fanState = HIGH;
-//    } else {
-//      fanState = LOW;
-//    }
+ }
